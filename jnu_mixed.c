@@ -17,6 +17,7 @@ good for Thetae > 1
 double jnu_synch(double nu, double Ne, double Thetae, double B,
 		 double theta)
 {
+	
 	double K2, nuc, nus, x, f, j, sth, xp1, xx;
 	double K2_eval(double Thetae);
 
@@ -38,6 +39,30 @@ double jnu_synch(double nu, double Ne, double Thetae, double B,
 	    exp(-xp1);
 
 	return (j);
+/*
+
+  if(Thetae < THETAE_MIN) return 0;
+  if(theta == M_PI/2.) theta = M_PI/2.01;
+  if(theta == M_PI/6.) theta = M_PI/6.01; 
+
+  double nu_c = (EE * B)
+               /(2. * M_PI * ME * CL);
+  double kappa_width = Thetae;
+  double kappa = 3.5;
+  double obs_angle = theta;
+  double nu_w = pow(kappa_width*kappa, 2.)*nu_c*sin(obs_angle);
+  double X_k = nu/nu_w;
+  double prefactor = (Ne*pow(EE, 2.)*nu_c*sin(obs_angle))
+	            /CL;
+  double Nlow = 4.*M_PI*tgamma(kappa-4./3.)/(pow(3., 7./3.)*tgamma(kappa-2.));
+  double Nhigh = (1./4.)*pow(3., (kappa-1.)/2.)*(kappa-2.)*(kappa-1.)
+		*tgamma(kappa/4.-1./3.)*tgamma(kappa/4.+4./3.);
+  double x = 3.*pow(kappa, -3./2.);
+  double ans = prefactor*Nlow*pow(X_k, 1./3.)*pow(1.+pow(X_k, x*(3.*kappa-4.)
+	      /6.)*pow(Nlow/Nhigh, x), -1./x);
+
+  return ans;
+*/
 }
 
 #undef CST

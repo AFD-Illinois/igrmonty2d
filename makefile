@@ -1,7 +1,7 @@
 #
 # requires an openmp-enabled version of gcc
 #
-CC = gcc49
+CC = gcc
 CCFLAGS  = -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp
 LDFLAGS = -lm -lgsl -lgslcblas 
 

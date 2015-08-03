@@ -14,10 +14,13 @@ good for Thetae > 1
 */
 
 #define CST 1.88774862536	/* 2^{11/12} */
+#define THERMAL (0)
+#define KAPPA   (1)
+#define EMISSIVITY KAPPA
 double jnu_synch(double nu, double Ne, double Thetae, double B,
 		 double theta)
 {
-	
+#if (EMISSIVITY == THERMAL)
 	double K2, nuc, nus, x, f, j, sth, xp1, xx;
 	double K2_eval(double Thetae);
 
@@ -39,7 +42,8 @@ double jnu_synch(double nu, double Ne, double Thetae, double B,
 	    exp(-xp1);
 
 	return (j);
-/*
+#elif (EMISSIVITY == KAPPA)
+
 
   if(Thetae < THETAE_MIN) return 0;
   if(theta == M_PI/2.) theta = M_PI/2.01;
@@ -62,7 +66,7 @@ double jnu_synch(double nu, double Ne, double Thetae, double B,
 	      /6.)*pow(Nlow/Nhigh, x), -1./x);
 
   return ans;
-*/
+#endif /* EMISSIVITY DISTRIBUTION FUNCTION */
 }
 
 #undef CST

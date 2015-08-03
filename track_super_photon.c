@@ -232,7 +232,7 @@ void track_super_photon(struct of_photon *ph)
 				ph->tau_scatt += dtau_scatt;
 
 			} else {
-				if (dtau_abs > 100)
+				if (dtau_abs > 100 || isnan(dtau_abs))
 					return;	/* This photon has been absorbed */
 				ph->tau_abs += dtau_abs;
 				ph->tau_scatt += dtau_scatt;
@@ -247,6 +247,14 @@ void track_super_photon(struct of_photon *ph)
 								    dtau))));
 				else
 					ph->w *= exp(-dtau);
+        if (isnan(ph->w))
+        {
+          fprintf(stderr, "ph->X[] = %e %e %e %e\n", ph->X[0], ph->X[1], ph->X[2], ph->X[3]);
+          fprintf(stderr, "NAN weight detected!\n");
+          fprintf(stderr, "x1 = %e, bias = %e, frac = %e\n", x1, bias, frac);
+          fprintf(stderr, "dtau = %e, dtau_abs = %e, dtau_scatt = %e\n", dtau, dtau_abs, dtau_scatt);
+          exit(-1);
+        }
 			}
 		}
 

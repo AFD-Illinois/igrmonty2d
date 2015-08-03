@@ -80,17 +80,20 @@ double kappa_I_abs(double nu, double Thetae, double Ne, double B,
   return ans;
 }
 
+#define THERMAL (0)
+#define KAPPA   (1)
+#define ABSORPTIVITY KAPPA
 /* return Lorentz invariant absorption opacity */
 double alpha_inv_abs(double nu, double Thetae, double Ne, double B,
 		     double theta)
 {
 	double j, bnu;
-#if (EMISSIVITY == THERMAL)
+#if (ABSORPTIVITY == THERMAL)
 	j = jnu_inv(nu, Thetae, Ne, B, theta);
 	bnu = Bnu_inv(nu, Thetae);
 
 	return (j / (bnu + 1.e-100));
-#elif (EMISSIVITY == KAPPA)
+#elif (ABSORPTIVITY == KAPPA)
   return (nu*kappa_I_abs(nu, Thetae, Ne, B, theta));
 #endif
 }

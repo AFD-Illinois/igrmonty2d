@@ -14,9 +14,6 @@ good for Thetae > 1
 */
 
 #define CST 1.88774862536	/* 2^{11/12} */
-#define THERMAL (0)
-#define KAPPA   (1)
-#define EMISSIVITY KAPPA
 double jnu_synch(double nu, double Ne, double Thetae, double B,
 		 double theta)
 {
@@ -52,15 +49,15 @@ double jnu_synch(double nu, double Ne, double Thetae, double B,
   double nu_c = (EE * B)
                /(2. * M_PI * ME * CL);
   double kappa_width = Thetae;
-  double kappa = 3.5;
+  double kappa = KAPPAVAL;
   double obs_angle = theta;
   double nu_w = pow(kappa_width*kappa, 2.)*nu_c*sin(obs_angle);
   double X_k = nu/nu_w;
   double prefactor = (Ne*pow(EE, 2.)*nu_c*sin(obs_angle))
 	            /CL;
-  double Nlow = 4.*M_PI*tgamma(kappa-4./3.)/(pow(3., 7./3.)*tgamma(kappa-2.));
-  double Nhigh = (1./4.)*pow(3., (kappa-1.)/2.)*(kappa-2.)*(kappa-1.)
-		*tgamma(kappa/4.-1./3.)*tgamma(kappa/4.+4./3.);
+  //double Nlow = 4.*M_PI*tgamma(kappa-4./3.)/(pow(3., 7./3.)*tgamma(kappa-2.));
+  //double Nhigh = (1./4.)*pow(3., (kappa-1.)/2.)*(kappa-2.)*(kappa-1.)
+  //		*tgamma(kappa/4.-1./3.)*tgamma(kappa/4.+4./3.);
   double x = 3.*pow(kappa, -3./2.);
   double ans = prefactor*Nlow*pow(X_k, 1./3.)*pow(1.+pow(X_k, x*(3.*kappa-4.)
 	      /6.)*pow(Nlow/Nhigh, x), -1./x);
@@ -90,7 +87,7 @@ double int_jnu(double Ne, double Thetae, double Bmag, double nu)
 		return 0.;
 
 	j_fac = Ne * Bmag * Thetae * Thetae / K2;
-
+printf("int_jnu being called!\n");
 	return JCST * j_fac * F_eval(Thetae, Bmag, nu);
 }
 
@@ -99,7 +96,7 @@ double int_jnu(double Ne, double Thetae, double Bmag, double nu)
 #define CST 1.88774862536	/* 2^{11/12} */
 double jnu_integrand(double th, void *params)
 {
-
+	#if (EMISSIVITY == THERMAL)
 	double K = *(double *) params;
 	double sth = sin(th);
 	double x = K / sth;
@@ -109,6 +106,12 @@ double jnu_integrand(double th, void *params)
 
 	return sth * sth * pow(sqrt(x) + CST * pow(x, 1. / 6.),
 			       2.) * exp(-pow(x, 1. / 3.));
+	#elif (EMISSIVITY == KAPPA)
+	if (th == M_PI/2.) th = M_PI/2.01;
+	if (th == M_PI/6.) th = M_PI/6.01;
+	double sth = sin(th)
+		
+	#endif /* EMISSIVITY */
 }
 
 #undef CST
@@ -192,7 +195,7 @@ double F_eval(double Thetae, double Bmag, double nu)
 
 	double K, x;
 	double linear_interp_F(double);
-
+        #if (EMISSIVITY == THERMAL)
 	K = KFAC * nu / (Bmag * Thetae * Thetae);
 
 	if (K > KMAX) {
@@ -204,6 +207,21 @@ double F_eval(double Thetae, double Bmag, double nu)
 	} else {
 		return linear_interp_F(K);
 	}
+        #elif (EMISSIVITY == KAPPA)
+        K = 2.*M_PI*ME*CL/EE;
+	K *= nu / (Bmag * Thetae * Thetae * KAPPAVAL * KAPPAVAL);
+	if (K > KMAX) {
+		return 0.;
+	} else if (K < KMIN) {
+		/* use a good approximation */
+		//x = pow(K, 0.333333333333333333);
+		//return (x * (37.67503800178 + 2.240274341836 * x));
+		fprintf(stderr, "[jnu_mixed.c] Invalid K range! Exiting...\n");
+		exit(-1);
+	} else {
+		return linear_interp_F(K);
+	}
+	#endif /* EMISSIVITY */
 }
 
 #undef KFAC

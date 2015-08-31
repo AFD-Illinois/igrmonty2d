@@ -26,6 +26,13 @@
 #define TP_OVER_TE	(3.)
 #define WEIGHT_MIN	(1.e28)
 
+/* Choice of distribution function and related parameters */
+#define THERMAL 0
+#define KAPPA   1
+#define EMISSIVITY KAPPA
+#define KAPPAVAL (3.5)
+extern double Nlow, Nhigh;
+
 /* mnemonics for primitive vars; conserved vars */
 #define KRHO     0
 #define UU      1

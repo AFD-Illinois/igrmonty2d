@@ -26,6 +26,12 @@ void init_model(char *args[])
 	   mass and its accretion rate */
 	set_units(args[3]);
 
+        #if (EMISSIVITY == KAPPA)
+        Nlow = 4.*M_PI*tgamma(KAPPA-4./3.)/(pow(3., 7./3.)*tgamma(KAPPA-2.));
+        Nhigh = (1./4.)*pow(3., (KAPPA-1.)/2.)*(KAPPA-2.)*(KAPPA-1.)
+		*tgamma(KAPPA/4.-1./3.)*tgamma(KAPPA/4.+4./3.);
+        #endif /* EMISSIVITY */
+
 	fprintf(stderr, "getting simulation data...\n");
 	init_harm_data(args[2]);	/* read in HARM simulation data */
 

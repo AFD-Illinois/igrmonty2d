@@ -54,7 +54,7 @@ double hslope;
 double startx[NDIM], stopx[NDIM], dx[NDIM];
 
 double dlE, lE0;
-double gam;
+double gam, game;
 double dMsim;
 double M_unit, L_unit, T_unit;
 double RHO_unit, U_unit, B_unit, Ne_unit, Thetae_unit;

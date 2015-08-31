@@ -1,8 +1,9 @@
 #
 # requires an openmp-enabled version of gcc
 #
-CC = gcc49
-CCFLAGS  = -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp
+CC = gcc
+#CCFLAGS  = -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp
+CCFLAGS = -Wall -fopenmp
 LDFLAGS = -lm -lgsl -lgslcblas 
 
 CC_COMPILE = $(CC) $(CCFLAGS) -c

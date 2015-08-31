@@ -50,6 +50,7 @@ void init_harm_data(char *fname)
 	fscanf(fp, "%d ", &nstep);
 	fscanf(fp, "%lf ", &a);
 	fscanf(fp, "%lf ", &gam);
+	fscanf(fp, "%lf ", &game);
 	fscanf(fp, "%lf ", &cour);
 	fscanf(fp, "%lf ", &DTd);
 	fscanf(fp, "%lf ", &DTl);
@@ -110,13 +111,19 @@ void init_harm_data(char *fname)
 			exit(1);
 		}
 
-		fscanf(fp, "%lf %lf %lf %lf %lf %lf %lf %lf",
+		fscanf(fp, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
 		       &p[KRHO][i][j],
 		       &p[UU][i][j],
 		       &p[U1][i][j],
 		       &p[U2][i][j],
 		       &p[U3][i][j],
-		       &p[B1][i][j], &p[B2][i][j], &p[B3][i][j]);
+		       &p[B1][i][j], 
+                       &p[B2][i][j], 
+                       &p[B3][i][j],
+                       &p[KTOT][i][j],
+                       &p[KELCOND][i][j],
+                       &p[KELNOCOND][i][j],
+                       &p[PHI][i][j]);
 
 
 		fscanf(fp, "%lf", &divb);
@@ -137,7 +144,7 @@ void init_harm_data(char *fname)
 		fscanf(fp, "%lf ", &gdet);
 
 	        /* additional stuff: current */
-		fscanf(fp, "%lf ", &J) ;
+		/*fscanf(fp, "%lf ", &J) ;
 		fscanf(fp, "%lf ", &J) ;
 		fscanf(fp, "%lf ", &J) ;
 		fscanf(fp, "%lf ", &J) ;
@@ -145,7 +152,7 @@ void init_harm_data(char *fname)
 		fscanf(fp, "%lf ", &J) ;
 		fscanf(fp, "%lf ", &J) ;
 		fscanf(fp, "%lf ", &J) ;
-		fscanf(fp, "%lf\n", &J) ;
+		fscanf(fp, "%lf\n", &J) ;*/
 
 		bias_norm +=
 		    dV * gdet * pow(p[UU][i][j] / p[KRHO][i][j] *

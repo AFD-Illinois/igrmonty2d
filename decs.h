@@ -30,7 +30,7 @@
 #define THERMAL 0
 #define KAPPA   1
 #define EMISSIVITY KAPPA
-#define KAPPAVAL (3.5)
+#define KAPPAVAL (3.)
 extern double Nlow, Nhigh;
 
 /* mnemonics for primitive vars; conserved vars */

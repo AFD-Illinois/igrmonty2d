@@ -253,7 +253,8 @@ void track_super_photon(struct of_photon *ph)
           fprintf(stderr, "NAN weight detected!\n");
           fprintf(stderr, "x1 = %e, bias = %e, frac = %e\n", x1, bias, frac);
           fprintf(stderr, "dtau = %e, dtau_abs = %e, dtau_scatt = %e\n", dtau, dtau_abs, dtau_scatt);
-          exit(-1);
+          ph->w = 0.;
+	  //exit(-1);
         }
 			}
 		}

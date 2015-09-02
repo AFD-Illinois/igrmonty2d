@@ -122,7 +122,7 @@ double jnu_integrand(double th, void *params)
 		return 0.;
 	//printf("args: sth = %e, Xk = %e, KAPPAVAL = %e, Nlow = %e, Nhigh = %e, x = %e\n", sth, Xk, KAPPAVAL, Nlow, Nhigh, x);
 	//printf("integrand: %e\n", sth * sth * pow(Xk,1./3.)*pow(1. + pow(Xk,(3.*KAPPAVAL-4.)/6.)*pow(Nlow/Nhigh,x),-1./x));
-	return sth * sth * pow(Xk,1./3.)*pow(1. + pow(Xk,(3.*KAPPAVAL-4.)/6.)*pow(Nlow/Nhigh,x),-1./x);
+	return sth * sth * pow(Xk,1./3.)*pow(1. + pow(Xk,x*(3.*KAPPAVAL-4.)/6.)*pow(Nlow/Nhigh,x),-1./x);
 		
 	#endif /* EMISSIVITY */
 }

@@ -1,10 +1,13 @@
 #
 # requires an openmp-enabled version of gcc
 #
-CC = gcc
-#CCFLAGS  = -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp
-CCFLAGS = -Wall -fopenmp
-LDFLAGS = -lm -lgsl -lgslcblas 
+CC = gcc-mp-4.9
+CCFLAGS  = -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp
+LDFLAGS = -L/Users/brryan/macports/lib -lm -lgsl -lgslcblas
+#CC = gcc
+##CCFLAGS  = -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp
+#CCFLAGS = -Wall -fopenmp
+#LDFLAGS = -lm -lgsl -lgslcblas 
 
 CC_COMPILE = $(CC) $(CCFLAGS) -c
 CC_LOAD = $(CC) $(CCFLAGS)

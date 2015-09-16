@@ -48,6 +48,7 @@ double F[N_ESAMP + 1], wgt[N_ESAMP + 1];
 int Ns, N_superph_recorded, N_scatt;
 
 /* some coordinate parameters */
+double MBH;
 double a;
 double R0, Rin, Rh, Rout, Rms;
 double hslope;

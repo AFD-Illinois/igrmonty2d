@@ -423,13 +423,13 @@ void coord(int i, int j, double *X)
 
 void set_units(char *munitstr)
 {
-	double MBH;
+	//double MBH;
 
 	sscanf(munitstr, "%lf", &M_unit);
 
 	/** from this, calculate units of length, time, mass,
 	    and derivative units **/
-	MBH = 4.6e6 * MSUN ;
+	MBH = 6.6e9 * MSUN ;
 	L_unit = GNEWT * MBH / (CL * CL);
 	T_unit = L_unit / CL;
 

@@ -95,8 +95,9 @@ double bias_func(double Te, double w)
 
 	max = 0.5 * w / WEIGHT_MIN;
 
-	bias = Te ;
-	//bias = 100. * Te * Te / (bias_norm * max_tau_scatt * (avg_num_scatt + 2));
+	//bias = Te ;
+	bias = 16.*Te*Te;
+  //bias = 100. * Te * Te / (bias_norm * max_tau_scatt * (avg_num_scatt + 2));
 
 	if (bias < TP_OVER_TE)
 		bias = TP_OVER_TE;
@@ -796,13 +797,23 @@ void report_spectrum(int N_superph_made)
 		}
 		fprintf(fp, "\n");
 	}
-	fprintf(stderr,
+	/*fprintf(stderr,
 		"luminosity %g, dMact %g, efficiency %g, L/Ladv %g, max_tau_scatt %g\n",
 		L, dMact * M_unit / T_unit / (MSUN / YEAR),
 		L * LSUN / (dMact * M_unit * CL * CL / T_unit),
 		L * LSUN / (Ladv * M_unit * CL * CL / T_unit),
-		max_tau_scatt);
-	fprintf(stderr, "\n");
+		max_tau_scatt);*/
+  double LEdd = 4.*M_PI*GNEWT*MBH*MP*CL/SIGMA_THOMSON;
+  double eff = 0.1;
+  double MdotEdd = LEdd/(CL*CL*eff);
+  double Mdot = -dMact*M_unit/T_unit;
+  fprintf(stderr, "\n");
+  fprintf(stderr, "MBH = %g Msolar, a = %g\n", MBH/MSUN, a);
+  fprintf(stderr, "LEdd = %g erg/s, MdotEdd = %g g/s\n", LEdd, MdotEdd); 
+	fprintf(stderr, "L = %g erg/s, Mdot = %g g/s\n", L*LSUN, Mdot);
+	fprintf(stderr, "L = %g LEdd,  Mdot = %g MdotEdd\n", L*LSUN/LEdd, Mdot/MdotEdd);
+  fprintf(stderr, "Efficiency: %g %%\n", 100.*L*LSUN/(Mdot*CL*CL));
+  fprintf(stderr, "\n");
 	fprintf(stderr, "N_superph_made: %d\n", N_superph_made);
 	fprintf(stderr, "N_superph_recorded: %d\n", N_superph_recorded);
 

@@ -1,7 +1,7 @@
 #
 # requires an openmp-enabled version of gcc
 #
-CC = gcc-mp-4.9
+CC = gcc
 CCFLAGS  = -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp
 LDFLAGS = -L/Users/brryan/macports/lib -lm -lgsl -lgslcblas
 #CC = gcc

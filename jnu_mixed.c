@@ -17,6 +17,7 @@ good for Thetae > 1
 double jnu_synch(double nu, double Ne, double Thetae, double B,
 		 double theta)
 {
+#if (EMISSIVITY == THERMAL)
 	double K2, nuc, nus, x, f, j, sth, xp1, xx;
 	double K2_eval(double Thetae);
 
@@ -38,6 +39,31 @@ double jnu_synch(double nu, double Ne, double Thetae, double B,
 	    exp(-xp1);
 
 	return (j);
+#elif (EMISSIVITY == KAPPA)
+
+
+  if(Thetae < THETAE_MIN) return 0;
+  if(theta == M_PI/2.) theta = M_PI/2.01;
+  if(theta == M_PI/6.) theta = M_PI/6.01; 
+
+  double nu_c = (EE * B)
+               /(2. * M_PI * ME * CL);
+  double kappa_width = Thetae;
+  double kappa = KAPPAVAL;
+  double obs_angle = theta;
+  double nu_w = pow(kappa_width*kappa, 2.)*nu_c*sin(obs_angle);
+  double X_k = nu/nu_w;
+  double prefactor = (Ne*pow(EE, 2.)*nu_c*sin(obs_angle))
+	            /CL;
+  //double Nlow = 4.*M_PI*tgamma(kappa-4./3.)/(pow(3., 7./3.)*tgamma(kappa-2.));
+  //double Nhigh = (1./4.)*pow(3., (kappa-1.)/2.)*(kappa-2.)*(kappa-1.)
+  //		*tgamma(kappa/4.-1./3.)*tgamma(kappa/4.+4./3.);
+  double x = 3.*pow(kappa, -3./2.);
+  double ans = prefactor*Nlow*pow(X_k, 1./3.)*pow(1.+pow(X_k, x*(3.*kappa-4.)
+	      /6.)*pow(Nlow/Nhigh, x), -1./x);
+
+  return ans;
+#endif /* EMISSIVITY DISTRIBUTION FUNCTION */
 }
 
 #undef CST
@@ -56,13 +82,17 @@ double int_jnu(double Ne, double Thetae, double Bmag, double nu)
 	if (Thetae < THETAE_MIN)
 		return 0.;
 
+	#if (EMISSIVITY == THERMAL)
 	K2 = K2_eval(Thetae);
 	if (K2 == 0.)
 		return 0.;
 
 	j_fac = Ne * Bmag * Thetae * Thetae / K2;
-
 	return JCST * j_fac * F_eval(Thetae, Bmag, nu);
+	#elif (EMISSIVITY == KAPPA)
+	j_fac = Ne*EE*EE*EE*Bmag/(ME*CL*CL)*Nlow;
+	return j_fac * F_eval(Thetae, Bmag, nu);
+	#endif /* EMISSIVITY */
 }
 
 #undef JCST
@@ -70,7 +100,7 @@ double int_jnu(double Ne, double Thetae, double Bmag, double nu)
 #define CST 1.88774862536	/* 2^{11/12} */
 double jnu_integrand(double th, void *params)
 {
-
+	#if (EMISSIVITY == THERMAL)
 	double K = *(double *) params;
 	double sth = sin(th);
 	double x = K / sth;
@@ -80,6 +110,21 @@ double jnu_integrand(double th, void *params)
 
 	return sth * sth * pow(sqrt(x) + CST * pow(x, 1. / 6.),
 			       2.) * exp(-pow(x, 1. / 3.));
+	#elif (EMISSIVITY == KAPPA)
+	if (th == M_PI/2.) th = M_PI/2.01;
+	if (th == M_PI/6.) th = M_PI/6.01;
+	double K = *(double *) params;
+	double sth = sin(th);
+	double Xk = K / sth;
+	double x = 3.*pow(KAPPAVAL,-3./2.);
+
+	if (sth < 1.e-150 || x > 2.e8)
+		return 0.;
+	//printf("args: sth = %e, Xk = %e, KAPPAVAL = %e, Nlow = %e, Nhigh = %e, x = %e\n", sth, Xk, KAPPAVAL, Nlow, Nhigh, x);
+	//printf("integrand: %e\n", sth * sth * pow(Xk,1./3.)*pow(1. + pow(Xk,(3.*KAPPAVAL-4.)/6.)*pow(Nlow/Nhigh,x),-1./x));
+	return sth * sth * pow(Xk,1./3.)*pow(1. + pow(Xk,x*(3.*KAPPAVAL-4.)/6.)*pow(Nlow/Nhigh,x),-1./x);
+		
+	#endif /* EMISSIVITY */
 }
 
 #undef CST
@@ -163,7 +208,7 @@ double F_eval(double Thetae, double Bmag, double nu)
 
 	double K, x;
 	double linear_interp_F(double);
-
+        #if (EMISSIVITY == THERMAL)
 	K = KFAC * nu / (Bmag * Thetae * Thetae);
 
 	if (K > KMAX) {
@@ -175,6 +220,23 @@ double F_eval(double Thetae, double Bmag, double nu)
 	} else {
 		return linear_interp_F(K);
 	}
+        #elif (EMISSIVITY == KAPPA)
+        K = 2.*M_PI*ME*CL/EE;
+	K *= nu / (Bmag * Thetae * Thetae * KAPPAVAL * KAPPAVAL);
+	if (K > KMAX) {
+		return 0.;
+	} else if (K < KMIN) {
+		//printf("K = %e, KMIN = %e (using thermal expansion!)\n", K, KMIN);
+		// WARNING!!!!!! THIS APPROXIMATION IS FOR THERMAL EMISSIVITY!
+		/* use a good approximation */
+		x = pow(K, 0.333333333333333333);
+		return (x * (37.67503800178 + 2.240274341836 * x));
+		//fprintf(stderr, "[jnu_mixed.c] Invalid K range! Exiting...\n");
+		//exit(-1);
+	} else {
+		return linear_interp_F(K);
+	}
+	#endif /* EMISSIVITY */
 }
 
 #undef KFAC

@@ -312,6 +312,8 @@ void sample_zone_photon(int i, int j, double dnmax, struct of_photon *ph)
 		 (F_eval(Thetae, Bmag, nu) / weight) / dnmax);
 
 	ph->w = weight;
+  if (isnan(weight))
+    fprintf(stderr, "[%i %i] WEIGHT IS NAN!\n");
 	jmax = jnu_synch(nu, Ne, Thetae, Bmag, M_PI / 2.);
 	do {
 		cth = 2. * monty_rand() - 1.;

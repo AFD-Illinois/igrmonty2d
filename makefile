@@ -2,8 +2,13 @@
 # requires an openmp-enabled version of gcc
 #
 CC = gcc
-CCFLAGS  = -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp
-LDFLAGS = -lm -lgsl -lgslcblas 
+#CCFLAGS  = -std=c99 -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp -I/home/bryan10/Documents/software/include
+CCFLAGS  = -std=c99 -Wall -fopenmp -I/home/bryan10/Documents/software/include
+LDFLAGS = -L/home/bryan10/Documents/software/lib -lm -lgsl -lgslcblas
+#CC = gcc
+##CCFLAGS  = -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp
+#CCFLAGS = -Wall -fopenmp
+#LDFLAGS = -lm -lgsl -lgslcblas 
 
 CC_COMPILE = $(CC) $(CCFLAGS) -c
 CC_LOAD = $(CC) $(CCFLAGS)

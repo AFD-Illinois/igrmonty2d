@@ -87,6 +87,9 @@ void track_super_photon(struct of_photon *ph)
 		if (stop_criterion(ph))
 			break;
 
+    if (isnan(ph->K[0]))
+      exit(-1);
+
 		/* allow photon to interact with matter, */
 		gcov_func(ph->X, Gcov);
 		get_fluid_params(ph->X, Gcov, &Ne, &Thetae, &B, Ucon, Ucov,

@@ -48,13 +48,14 @@ double F[N_ESAMP + 1], wgt[N_ESAMP + 1];
 int Ns, N_superph_recorded, N_scatt;
 
 /* some coordinate parameters */
+double MBH;
 double a;
 double R0, Rin, Rh, Rout, Rms;
 double hslope;
 double startx[NDIM], stopx[NDIM], dx[NDIM];
 
 double dlE, lE0;
-double gam;
+double gam, game;
 double dMsim;
 double M_unit, L_unit, T_unit;
 double RHO_unit, U_unit, B_unit, Ne_unit, Thetae_unit;
@@ -73,8 +74,8 @@ int main(int argc, char *argv[])
 	struct of_photon ph;
 	time_t currtime, starttime;
 
-	if (argc < 3) {
-		fprintf(stderr, "usage: grmonty Ns infilename M_unit\n");
+	if (argc != 3) {
+		fprintf(stderr, "usage: grmonty Ns infilename\n");
 		exit(0);
 	}
 	sscanf(argv[1], "%lf", &Ntot);

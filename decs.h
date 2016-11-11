@@ -15,7 +15,7 @@
 #include "constants.h"
 
 #define NDIM	4
-#define NPRIM	8
+#define NPRIM	13
 
 /* Range of initial superphoton frequencies */
 #define NUMIN 1.e9
@@ -27,14 +27,19 @@
 #define WEIGHT_MIN	(1.e28)
 
 /* mnemonics for primitive vars; conserved vars */
-#define KRHO     0
-#define UU      1
-#define U1      2
-#define U2      3
-#define U3      4
-#define B1      5
-#define B2      6
-#define B3      7
+#define KRHO      0
+#define UU        1
+#define U1        2
+#define U2        3
+#define U3        4
+#define B1        5
+#define B2        6
+#define B3        7
+#define KTOT      8
+#define KELCOND   9
+#define KELNOCOND 10
+#define PHI       11
+#define FLR       12
 
 /* numerical convenience */
 #define SMALL	1.e-40
@@ -110,12 +115,13 @@ extern int N1, N2, N3;
 extern int n_within_horizon;
 
 /* some coordinate parameters */
+extern double MBH;
 extern double a;
 extern double R0, Rin, Rh, Rout, Rms;
 extern double hslope;
 extern double startx[NDIM], stopx[NDIM], dx[NDIM];
 extern double dlE, lE0;
-extern double gam;
+extern double gam, game;
 extern double dMsim;
 
 extern double M_unit;

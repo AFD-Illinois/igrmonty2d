@@ -38,18 +38,32 @@ void init_harm_data(char *fname)
 		fprintf(stderr, "successfully opened %s\n", fname);
 	}
 
+  int idum;
+  double fdum;
 	/* get standard HARM header */
 	fscanf(fp, "%lf ", &t);
 	fscanf(fp, "%d ", &N1);
 	fscanf(fp, "%d ", &N2);
+  fscanf(fp, "%d ", &idum); // N3
 	fscanf(fp, "%lf ", &startx[1]);
 	fscanf(fp, "%lf ", &startx[2]);
+	fscanf(fp, "%lf ", &fdum); // startx[3]
 	fscanf(fp, "%lf ", &dx[1]);
 	fscanf(fp, "%lf ", &dx[2]);
+	fscanf(fp, "%lf ", &fdum); // dx[3]
 	fscanf(fp, "%lf ", &tf);
 	fscanf(fp, "%d ", &nstep);
+  fscanf(fp, "%lf ", &MBH);
 	fscanf(fp, "%lf ", &a);
+  fscanf(fp, "%lf ", &L_unit);
+  fscanf(fp, "%lf ", &T_unit);
+  fscanf(fp, "%lf ", &M_unit);
+  fscanf(fp, "%lf ", &Thetae_unit);
 	fscanf(fp, "%lf ", &gam);
+	fscanf(fp, "%lf ", &game);
+	fscanf(fp, "%lf ", &fdum); // gamp
+  fscanf(fp, "%d ", &idum); // RADMODEL
+  fscanf(fp, "%lf ", &fdum); // tp_over_te
 	fscanf(fp, "%lf ", &cour);
 	fscanf(fp, "%lf ", &DTd);
 	fscanf(fp, "%lf ", &DTl);
@@ -65,6 +79,11 @@ void init_harm_data(char *fname)
 	fscanf(fp, "%lf ", &Rout);
 	fscanf(fp, "%lf ", &hslope);
 	fscanf(fp, "%lf ", &R0);
+  fscanf(fp, "%d ", &idum); // WITH_ELECTRONS
+  fscanf(fp, "%d ", &idum); // SPEC_THETABINS
+  fscanf(fp, "%d ", &idum); // SPEC_FREQBINS
+  fscanf(fp, "%lf ", &fdum); // SPEC_NUMIN
+  fscanf(fp, "%lf ", &fdum); // SPEC_NUMAX
 
 	/* nominal non-zero values for axisymmetric simulations */
 	startx[0] = 0.;
@@ -81,13 +100,20 @@ void init_harm_data(char *fname)
 	dx[0] = 1.;
 	dx[3] = 2. * M_PI;
 
+  /* Finish setting up unit conversions */
+  RHO_unit = M_unit / pow(L_unit, 3);
+  U_unit = RHO_unit * CL * CL;
+  B_unit = CL * sqrt(4. * M_PI * RHO_unit);
+  Ne_unit = RHO_unit / (MP + ME);
+  max_tau_scatt = (6. * L_unit) * RHO_unit * 0.4;
+
 	/* Allocate storage for all model size dependent variables */
 	init_storage();
 
-	two_temp_gam =
-	    0.5 * ((1. + 2. / 3. * (TP_OVER_TE + 1.) / (TP_OVER_TE + 2.)) +
-		   gam);
-	Thetae_unit = (two_temp_gam - 1.) * (MP / ME) / (1. + TP_OVER_TE);
+	//two_temp_gam =
+	//    0.5 * ((1. + 2. / 3. * (TP_OVER_TE + 1.) / (TP_OVER_TE + 2.)) +
+	//	   gam);
+	//Thetae_unit = (two_temp_gam - 1.) * (MP / ME) / (1. + TP_OVER_TE);
 
 	dMact = 0.;
 	Ladv = 0.;
@@ -110,13 +136,20 @@ void init_harm_data(char *fname)
 			exit(1);
 		}
 
-		fscanf(fp, "%lf %lf %lf %lf %lf %lf %lf %lf",
+		fscanf(fp, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
 		       &p[KRHO][i][j],
 		       &p[UU][i][j],
 		       &p[U1][i][j],
 		       &p[U2][i][j],
 		       &p[U3][i][j],
-		       &p[B1][i][j], &p[B2][i][j], &p[B3][i][j]);
+		       &p[B1][i][j], 
+                       &p[B2][i][j], 
+                       &p[B3][i][j],
+                       &p[KTOT][i][j],
+                       &p[KELCOND][i][j],
+                       &p[KELNOCOND][i][j],
+                       &p[PHI][i][j],
+                       &p[FLR][i][j]);
 
 
 		fscanf(fp, "%lf", &divb);
@@ -136,16 +169,16 @@ void init_harm_data(char *fname)
 		fscanf(fp, "%lf ", &vmax);
 		fscanf(fp, "%lf ", &gdet);
 
-	        /* additional stuff: current */
-		fscanf(fp, "%lf ", &J) ;
-		fscanf(fp, "%lf ", &J) ;
-		fscanf(fp, "%lf ", &J) ;
-		fscanf(fp, "%lf ", &J) ;
+    /* Additional stuff */
+    fscanf(fp, "%lf ", &fdum); // <G_0>
+    fscanf(fp, "%lf ", &fdum); // <G_1>
+    fscanf(fp, "%lf ", &fdum); // <G_2>
+    fscanf(fp, "%lf ", &fdum); // <G_3>
+    
+    fscanf(fp, "%lf ", &fdum); // qud
 
-		fscanf(fp, "%lf ", &J) ;
-		fscanf(fp, "%lf ", &J) ;
-		fscanf(fp, "%lf ", &J) ;
-		fscanf(fp, "%lf\n", &J) ;
+    fscanf(fp, "%d ", &idum); // N_esuper
+    fscanf(fp, "%d ", &idum); // N_esuper_electron
 
 		bias_norm +=
 		    dV * gdet * pow(p[UU][i][j] / p[KRHO][i][j] *

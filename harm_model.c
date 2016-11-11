@@ -24,7 +24,7 @@ void init_model(char *args[])
 {
 	/* find dimensional quantities from black hole
 	   mass and its accretion rate */
-	set_units(args[3]);
+  //set_units(args[3]);
 
 	fprintf(stderr, "getting simulation data...\n");
 	init_harm_data(args[2]);	/* read in HARM simulation data */
@@ -95,8 +95,9 @@ double bias_func(double Te, double w)
 
 	max = 0.5 * w / WEIGHT_MIN;
 
-	bias = Te ;
-	//bias = 100. * Te * Te / (bias_norm * max_tau_scatt * (avg_num_scatt + 2));
+	//bias = Te ;
+	bias = 16.*Te*Te;
+  //bias = 100. * Te * Te / (bias_norm * max_tau_scatt * (avg_num_scatt + 2));
 
 	if (bias < TP_OVER_TE)
 		bias = TP_OVER_TE;
@@ -122,7 +123,8 @@ void get_fluid_zone(int i, int j, double *Ne, double *Thetae, double *B,
 	double sig ;
 
 	*Ne = p[KRHO][i][j] * Ne_unit;
-	*Thetae = p[UU][i][j] / (*Ne) * Ne_unit * Thetae_unit;
+	*Thetae = p[KELCOND][i][j]*pow(p[KRHO][i][j],game-1.)*Thetae_unit;
+  //*Thetae = p[UU][i][j] / (*Ne) * Ne_unit * Thetae_unit;
 
 	Bp[1] = p[B1][i][j];
 	Bp[2] = p[B2][i][j];
@@ -171,7 +173,7 @@ void get_fluid_params(double X[NDIM], double gcov[NDIM][NDIM], double *Ne,
 {
 	int i, j;
 	double del[NDIM];
-	double rho, uu;
+	double rho, uu, kel;
 	double Bp[NDIM], Vcon[NDIM], Vfac, VdotV, UdotBp;
 	double gcon[NDIM][NDIM], coeff[4];
 	double interp_scalar(double **var, int i, int j, double del[4]);
@@ -194,9 +196,11 @@ void get_fluid_params(double X[NDIM], double gcov[NDIM][NDIM], double *Ne,
 
 	rho = interp_scalar(p[KRHO], i, j, coeff);
 	uu = interp_scalar(p[UU], i, j, coeff);
+  kel = interp_scalar(p[KELCOND], i, j, coeff);
 
 	*Ne = rho * Ne_unit;
-	*Thetae = uu / rho * Thetae_unit;
+	*Thetae = kel*pow(rho,game-1.)*Thetae_unit;
+  //*Thetae = uu / rho * Thetae_unit;
 
 	Bp[1] = interp_scalar(p[B1], i, j, coeff);
 	Bp[2] = interp_scalar(p[B2], i, j, coeff);
@@ -627,6 +631,9 @@ void record_super_photon(struct of_photon *ph)
 	N_scatt += ph->nscatt;
 
 	/* sum in photon */
+  if (isnan(ph->w)) exit(-1);
+  //printf("%i %e, %i\n", isnan(ph->w), DBL_MAX, (ph->w < DBL_MAX));
+  //printf("ph->w = %e ph->E = %e\n", ph->w, ph->E);
 	spect[ix2][iE].dNdlE += ph->w;
 	spect[ix2][iE].dEdlE += ph->w * ph->E;
 	spect[ix2][iE].tau_abs += ph->w * ph->tau_abs;
@@ -732,6 +739,22 @@ void report_spectrum(int N_superph_made)
 		fprintf(stderr, "trouble opening spectrum file\n");
 		exit(0);
 	}
+  
+  double LEdd = 4.*M_PI*GNEWT*MBH*MP*CL/SIGMA_THOMSON;
+  double eff = 0.1;
+  double MdotEdd = LEdd/(CL*CL*eff);
+  double Mdot = -dMact*M_unit/T_unit;
+
+  /* Header */
+  fprintf(fp, "%10.5g ", MBH);
+  fprintf(fp, "%10.5g ", Mdot);
+  fprintf(fp, "%10.5g ", LEdd);
+  fprintf(fp, "%10.5g ", MdotEdd);
+  fprintf(fp, "%d ", N_EBINS);
+  fprintf(fp, "%d ", N_THBINS);
+  fprintf(fp, "%d ", 7); // Variables per bin
+  fprintf(fp, "%10.5g ", hslope);
+  fprintf(fp, "\n");
 
 	/* output */
 	max_tau_scatt = 0.;
@@ -757,7 +780,7 @@ void report_spectrum(int N_superph_made)
 			nuLnu *= spect[j][i].dEdlE;
 			nuLnu /= LSUN;
 
-			tau_scatt =
+      tau_scatt =
 			    spect[j][i].tau_scatt / (spect[j][i].dNdlE +
 						     SMALL);
 			fprintf(fp,
@@ -782,7 +805,9 @@ void report_spectrum(int N_superph_made)
 			if(nu0 < 230.e9 && nu1 > 230.e9) {
 				nu = ME * CL * CL * exp(i * dlE + lE0) / HPL ;
 				fnu = nuLnu*LSUN/(4.*M_PI*dsource*dsource*nu*JY) ;
-				fprintf(stderr,"fnu: %10.5g\n",fnu) ;
+				fprintf(stderr, "nuLnu = %e, LSUN = %e, dsource = %e, nu = %e, JY = %e, dlE = %e\n",
+            nuLnu, LSUN, dsource, nu, JY, dlE);
+        fprintf(stderr,"fnu: %10.5g\n",fnu) ;
 			}
 
 			/* added to give average # scatterings */
@@ -793,16 +818,22 @@ void report_spectrum(int N_superph_made)
 				max_tau_scatt = tau_scatt;
 
 			L += nuLnu * dOmega * dlE;
-		}
+		} /* Loop over theta bins */
 		fprintf(fp, "\n");
 	}
-	fprintf(stderr,
+	/*fprintf(stderr,
 		"luminosity %g, dMact %g, efficiency %g, L/Ladv %g, max_tau_scatt %g\n",
 		L, dMact * M_unit / T_unit / (MSUN / YEAR),
 		L * LSUN / (dMact * M_unit * CL * CL / T_unit),
 		L * LSUN / (Ladv * M_unit * CL * CL / T_unit),
-		max_tau_scatt);
-	fprintf(stderr, "\n");
+		max_tau_scatt);*/
+  fprintf(stderr, "\n");
+  fprintf(stderr, "MBH = %g Msolar, a = %g\n", MBH/MSUN, a);
+  fprintf(stderr, "LEdd = %g erg/s, MdotEdd = %g g/s\n", LEdd, MdotEdd); 
+	fprintf(stderr, "L = %g erg/s, Mdot = %g g/s\n", L*LSUN, Mdot);
+	fprintf(stderr, "L = %g LEdd,  Mdot = %g MdotEdd\n", L*LSUN/LEdd, Mdot/MdotEdd);
+  fprintf(stderr, "Efficiency: %g %%\n", 100.*L*LSUN/(Mdot*CL*CL));
+  fprintf(stderr, "\n");
 	fprintf(stderr, "N_superph_made: %d\n", N_superph_made);
 	fprintf(stderr, "N_superph_recorded: %d\n", N_superph_recorded);
 

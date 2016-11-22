@@ -16,7 +16,7 @@ good for Thetae > 1
 #define CST 1.88774862536	/* 2^{11/12} */
 #define THERMAL (0)
 #define KAPPA   (1)
-#define EMISSIVITY KAPPA
+#define EMISSIVITY THERMAL
 double jnu_synch(double nu, double Ne, double Thetae, double B,
 		 double theta)
 {

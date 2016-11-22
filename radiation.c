@@ -82,7 +82,7 @@ double kappa_I_abs(double nu, double Thetae, double Ne, double B,
 
 #define THERMAL (0)
 #define KAPPA   (1)
-#define ABSORPTIVITY KAPPA
+#define ABSORPTIVITY THERMAL
 /* return Lorentz invariant absorption opacity */
 double alpha_inv_abs(double nu, double Thetae, double Ne, double B,
 		     double theta)

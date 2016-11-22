@@ -18,7 +18,7 @@
 #define NPRIM	13
 
 /* Range of initial superphoton frequencies */
-#define NUMIN 1.e9
+#define NUMIN 1.e7
 #define NUMAX 1.e20
 
 #define THETAE_MAX	1000.	

@@ -96,7 +96,7 @@ double bias_func(double Te, double w)
 	max = 0.5 * w / WEIGHT_MIN;
 
 	//bias = Te ;
-	bias = 16.*Te*Te;
+	bias = 100.*Te*Te;
   //bias = 100. * Te * Te / (bias_norm * max_tau_scatt * (avg_num_scatt + 2));
 
 	if (bias < TP_OVER_TE)
@@ -124,6 +124,7 @@ void get_fluid_zone(int i, int j, double *Ne, double *Thetae, double *B,
 
 	*Ne = p[KRHO][i][j] * Ne_unit;
 	*Thetae = p[KELCOND][i][j]*pow(p[KRHO][i][j],game-1.)*Thetae_unit;
+  //if (*Thetae > 1000) *Thetae = 1000.;
   //*Thetae = p[UU][i][j] / (*Ne) * Ne_unit * Thetae_unit;
 
 	Bp[1] = p[B1][i][j];

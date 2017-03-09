@@ -91,7 +91,7 @@ void init_harm_data(char *fname)
     T_unit = GNEWT*MBH/(CL*CL*CL);
     M_unit = 8.e21;
   }
-  M_unit = 8.e24;
+  //M_unit = 8.e24;
   printf("L_unit = %e T_unit = %e M_unit = %e\n", L_unit, T_unit, M_unit);
 
 	/* nominal non-zero values for axisymmetric simulations */

@@ -96,7 +96,8 @@ double bias_func(double Te, double w)
 	max = 0.5 * w / WEIGHT_MIN;
 
 	//bias = Te ;
-	bias = 100.*Te*Te;
+	bias = 10.*Te*Te; // for mdot > 1e-5
+  //bias = 100.*Te*Te;
   //bias = 100. * Te * Te / (bias_norm * max_tau_scatt * (avg_num_scatt + 2));
 
 	if (bias < TP_OVER_TE)
@@ -124,7 +125,7 @@ void get_fluid_zone(int i, int j, double *Ne, double *Thetae, double *B,
 
 	*Ne = p[KRHO][i][j] * Ne_unit;
 	*Thetae = p[KELCOND][i][j]*pow(p[KRHO][i][j],game-1.)*Thetae_unit;
-  //if (*Thetae > 1000) *Thetae = 1000.;
+  if (*Thetae > THETAE_MAX) *Thetae = THETAE_MAX;
   //*Thetae = p[UU][i][j] / (*Ne) * Ne_unit * Thetae_unit;
 
 	Bp[1] = p[B1][i][j];
@@ -744,6 +745,7 @@ void report_spectrum(int N_superph_made)
   double LEdd = 4.*M_PI*GNEWT*MBH*MP*CL/SIGMA_THOMSON;
   double eff = 0.1;
   double MdotEdd = LEdd/(CL*CL*eff);
+  printf("M_unit = %e T_unit = %e\n", M_unit, T_unit);
   double Mdot = -dMact*M_unit/T_unit;
 
   /* Header */
@@ -818,7 +820,7 @@ void report_spectrum(int N_superph_made)
 			if (tau_scatt > max_tau_scatt)
 				max_tau_scatt = tau_scatt;
 
-			L += nuLnu * dOmega * dlE;
+			L += nuLnu * dOmega * dlE / (4. *M_PI);
 		} /* Loop over theta bins */
 		fprintf(fp, "\n");
 	}
@@ -834,6 +836,7 @@ void report_spectrum(int N_superph_made)
 	fprintf(stderr, "L = %g erg/s, Mdot = %g g/s\n", L*LSUN, Mdot);
 	fprintf(stderr, "L = %g LEdd,  Mdot = %g MdotEdd\n", L*LSUN/LEdd, Mdot/MdotEdd);
   fprintf(stderr, "Efficiency: %g %%\n", 100.*L*LSUN/(Mdot*CL*CL));
+  fprintf(stderr, "Efficiency: %e\n", L*LSUN/(Mdot*CL*CL));
   fprintf(stderr, "\n");
 	fprintf(stderr, "N_superph_made: %d\n", N_superph_made);
 	fprintf(stderr, "N_superph_recorded: %d\n", N_superph_recorded);

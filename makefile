@@ -4,7 +4,7 @@
 CC = gcc
 #CCFLAGS  = -std=c99 -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp -I/home/bryan10/Documents/software/include
 CCFLAGS  = -std=c99 -Wall -fopenmp -I/home/bryan10/Documents/software/include
-LDFLAGS = -L/home/bryan10/Documents/software/lib -lm -lgsl -lgslcblas
+LDFLAGS = -L/home/brryan/Software/gsl/lib -lm -lgsl -lgslcblas
 #CC = gcc
 ##CCFLAGS  = -Wall -Ofast -ftree-vectorizer-verbose=1 -fopenmp
 #CCFLAGS = -Wall -fopenmp

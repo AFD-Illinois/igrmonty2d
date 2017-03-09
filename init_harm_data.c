@@ -85,6 +85,15 @@ void init_harm_data(char *fname)
   fscanf(fp, "%lf ", &fdum); // SPEC_NUMIN
   fscanf(fp, "%lf ", &fdum); // SPEC_NUMAX
 
+  if (M_unit < 0. || MBH < 0.) {
+    MBH = 1.e8*MSUN;
+    L_unit = GNEWT*MBH/(CL*CL);
+    T_unit = GNEWT*MBH/(CL*CL*CL);
+    M_unit = 8.e21;
+  }
+  M_unit = 8.e24;
+  printf("L_unit = %e T_unit = %e M_unit = %e\n", L_unit, T_unit, M_unit);
+
 	/* nominal non-zero values for axisymmetric simulations */
 	startx[0] = 0.;
 	startx[3] = 0.;
@@ -152,6 +161,12 @@ void init_harm_data(char *fname)
                        &p[FLR][i][j]);
 
 
+    /* No emission beyond 40 M */
+    if (r > 40.) {
+      p[KELCOND][i][j] *= 1.e-4;
+      p[UU][i][j] *= 1.e-4;
+    }
+
 		fscanf(fp, "%lf", &divb);
 
 		fscanf(fp, "%lf %lf %lf %lf",
@@ -180,15 +195,17 @@ void init_harm_data(char *fname)
     fscanf(fp, "%d ", &idum); // N_esuper
     fscanf(fp, "%d ", &idum); // N_esuper_electron
 
+		//bias_norm +=
+		//    dV * gdet * pow(p[UU][i][j] / p[KRHO][i][j] *
+		//		    Thetae_unit, 2.);
 		bias_norm +=
-		    dV * gdet * pow(p[UU][i][j] / p[KRHO][i][j] *
-				    Thetae_unit, 2.);
+		    dV * gdet * pow(p[KELCOND][i][j]*pow(p[KRHO][i][j],game-1.)*Thetae_unit, 2.);
 		V += dV * gdet;
 
 		/* check accretion rate */
 		if (i <= 20)
 			dMact += gdet * p[KRHO][i][j] * Ucon[1];
-		if (i >= 20 && i < 40)
+    if (i >= 20 && i < 40)
 			Ladv += gdet * p[UU][i][j] * Ucon[1] * Ucov[0];
 
 	}

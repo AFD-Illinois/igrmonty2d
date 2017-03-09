@@ -59,9 +59,14 @@ void sample_scattered_photon(double k[4], double p[4], double kp[4])
 
 	/* unit vector 1 for scattering coordinate system is
 	   oriented along initial photon wavevector */
-	v0x = ke[1] / ke[0];
-	v0y = ke[2] / ke[0];
-	v0z = ke[3] / ke[0];
+    double kemag = sqrt(ke[1]*ke[1] + ke[2]*ke[2] + ke[3]*ke[3]);                
+    v0x = ke[1] / kemag; //ke[0];                                                
+    v0y = ke[2] / kemag; //ke[0];                                                
+    v0z = ke[3] / kemag; //ke[0];	
+  
+  //v0x = ke[1] / ke[0];
+	//v0y = ke[2] / ke[0];
+	//v0z = ke[3] / ke[0];
 
 	/* randomly pick zero-angle for scattering coordinate system.
 	   There's undoubtedly a better way to do this. */

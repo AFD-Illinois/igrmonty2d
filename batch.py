@@ -49,7 +49,13 @@ HPL = 6.6260755e-27
 
 # Call grmonty for each dump
 for n in xrange(Nd):
-  if n*DTd >= tmin:
+  f = open(dumps[n], 'r')
+  t = float(f.readline().split()[0])
+  print t
+  f.close()
+  if t >= tmin:
+
+  #if n*DTd >= tmin:
     navg += 1
     print dumps[n]
     print ['./igrmonty2d', '%g' % N, dumps[n]]

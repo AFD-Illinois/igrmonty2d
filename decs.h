@@ -14,6 +14,9 @@
 #include <omp.h>
 #include "constants.h"
 
+// Include bremsstrahlung?
+#define BREM (0)
+
 #define NDIM	4
 #define NPRIM	13
 

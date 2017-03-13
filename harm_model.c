@@ -97,6 +97,10 @@ double bias_func(double Te, double w)
 
 	//bias = Te ;
 	bias = 10.*Te*Te; // for mdot > 1e-5
+  if (M_unit < 1.e23)
+    bias *= 10.;
+  if (M_unit < 1.e22)
+    bias *= 5.;
   //bias = 100.*Te*Te;
   //bias = 100. * Te * Te / (bias_norm * max_tau_scatt * (avg_num_scatt + 2));
 

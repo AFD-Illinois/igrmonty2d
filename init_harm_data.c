@@ -140,6 +140,7 @@ void init_harm_data(char *fname)
 			fprintf(stderr, "grid setup error\n");
 			fprintf(stderr, "rp,r,hp,h: %g %g %g %g\n",
 				rp, r, hp, h);
+      printf("hslope = %e R0 = %e\n", hslope, R0);
 			fprintf(stderr,
 				"edit R0, hslope, compile, and continue\n");
 			exit(1);
@@ -162,10 +163,10 @@ void init_harm_data(char *fname)
 
 
     /* No emission beyond 40 M */
-    if (r > 40.) {
-      p[KELCOND][i][j] *= 1.e-4;
-      p[UU][i][j] *= 1.e-4;
-    }
+    //if (r > 180.) {
+    //  p[KELCOND][i][j] *= 1.e-4;
+    //  p[UU][i][j] *= 1.e-4;
+    //}
 
 		fscanf(fp, "%lf", &divb);
 
@@ -191,9 +192,10 @@ void init_harm_data(char *fname)
     fscanf(fp, "%lf ", &fdum); // <G_3>
     
     fscanf(fp, "%lf ", &fdum); // qud
+    fscanf(fp, "%lf ", &fdum); // qcoul
 
-    fscanf(fp, "%d ", &idum); // N_esuper
-    fscanf(fp, "%d ", &idum); // N_esuper_electron
+    fscanf(fp, "%lf ", &fdum); // N_esuper
+    fscanf(fp, "%lf ", &fdum); // N_esuper_electron
 
 		//bias_norm +=
 		//    dV * gdet * pow(p[UU][i][j] / p[KRHO][i][j] *

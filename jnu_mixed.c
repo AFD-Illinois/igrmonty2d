@@ -17,6 +17,26 @@ good for Thetae > 1
 #define THERMAL (0)
 #define KAPPA   (1)
 #define EMISSIVITY THERMAL
+
+double jnu_brem(double nu, double Ne, double Thetae)
+{
+  double Rei, gff;
+  double Te = Thetae*ME*CL*CL/KBOL;
+  double xe = HPL*nu/(KBOL*Te);
+  if (Thetae > 1.) {
+    Rei = 1. + 1.76*pow(Thetae, 1.34);
+  } else {
+    Rei = 1.4*pow(Thetae, 0.5)*(log(1.12*Thetae + 0.48) + 1.5);
+  }
+  double gff_1 = sqrt(3.*KBOL*Te/(M_PI*HPL*nu));
+  double gff_2 = sqrt(3.)/M_PI*log(2.2*KBOL*Te/(HPL*nu));
+  gff = gff_1*exp(-1./xe) + gff_2*(1. - exp(-1./xe));
+  double jnu = 8.*sqrt(2.*M_PI/3.)*Ne*Ne*pow(EE,6.)*sqrt(1./(KBOL*ME));
+  jnu *= exp(-HPL*nu/(KBOL*Te))/(3.*CL*CL*CL*ME*sqrt(Te));
+  jnu *= Rei*gff;
+  return jnu;
+}
+
 double jnu_synch(double nu, double Ne, double Thetae, double B,
 		 double theta)
 {
@@ -40,6 +60,10 @@ double jnu_synch(double nu, double Ne, double Thetae, double B,
 	f = xx * xx;
 	j = (M_SQRT2 * M_PI * EE * EE * Ne * nus / (3. * CL * K2)) * f *
 	    exp(-xp1);
+
+  #if BREMS
+  return (j + jnu_brem(nu, Ne, Thetae));
+  #endif
 
 	return (j);
 #elif (EMISSIVITY == KAPPA)
@@ -76,6 +100,8 @@ double int_jnu(double Ne, double Thetae, double Bmag, double nu)
 {
 /* Returns energy per unit time at							*
  * frequency nu in cgs										*/
+
+  // NOT USED FOR ANYTHING -- BRR 3/17
 
 	double j_fac, K2;
 	double F_eval(double Thetae, double B, double nu);

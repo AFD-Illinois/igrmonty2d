@@ -120,6 +120,9 @@ void init_weight_table(void)
 				for (l = lstart; l < lend; l++)
 					sum[l] +=
 					    fac * F_eval(Thetae, B, nu[l]);
+          #if BREMS
+          sum[l] += sfac*geom[i][j].g*4.*M_PI*jnu_brem(nu[l], Ne, Thetae)*nu[l]*dlnu;
+          #endif
 			}
 #pragma omp barrier
 	}
